@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiCloudHub</title>
+
+  <!-- ✅ Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ✅ Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+  <!-- ✅ Firebase SDKs (Firebase for your app) -->
+  <script defer src="/__/firebase/11.8.1/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-database-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-firestore-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-functions-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-messaging-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-storage-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-analytics-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-remote-config-compat.js"></script>
+  <script defer src="/__/firebase/11.8.1/firebase-performance-compat.js"></script>
+  <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+  <!-- ✅ Tailwind CSS CDN (Tailwind CSS Framework) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Custom CSS (Your custom styles, if any) -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="bg-[#0a121c] text-white font-['Inter']">
+  <div id="root"></div>
+
+  <!-- Vite will inject your React app here -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- ✅ Social Media Links (Fixed Position for Instagram and Twitter) -->
+  <section id="socialLinks" aria-label="Social Media Links" class="fixed bottom-5 left-5 flex gap-6 text-[#7a8ca6] text-2xl select-none z-50">
+    <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" class="hover:text-[#2dd4bf]">
+      <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://twitter.com/" target="_blank" rel="noopener" aria-label="X Twitter" class="hover:text-[#2dd4bf]">
+      <i class="fab fa-twitter"></i>
+    </a>
+  </section>
+
+  <!-- ✅ Optional: Include any additional JavaScript libraries or functionality here -->
+  <script src="script.js"></script>
+</body>
+
+</html>
