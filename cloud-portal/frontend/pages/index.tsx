@@ -1,15 +1,21 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { message } from "antd";
-import { Header } from "../components/IndexPage/header";
-import { FeatureCards } from "../components/IndexPage/featurecard";
-import { FeatureDetail } from "../components/IndexPage/featuredetails";
-import { SocialLinks } from "../components/IndexPage/sociallink";
-import { FeatureKey } from "../components/IndexPage/feature";
-import { GoogleAuthProvider, signInWithPopup, getAuth, signOut } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAuth,
+  signOut,
+} from "firebase/auth";
 import { app } from "../firebase";
-import { Moon, Sun } from "lucide-react"; // optional: you can use any icon
+
+import { Header } from "../components/Homepage/Header";
+import { IntroText } from "../components/Homepage/Introtext";
+import { FeatureCards } from "../components/Homepage/Featurecard";
+import { FeatureDetail } from "../components/Homepage/Featuredetails";
+import { SocialLinks } from "../components/Homepage/SocialLinks";
+import { FeatureKey } from "../components/Homepage/Featuresdata";
 
 export default function Home() {
   const router = useRouter();
@@ -18,28 +24,11 @@ export default function Home() {
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<FeatureKey | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const detailRef = useRef<HTMLElement | null>(null);
+
+  const detailRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Close selected card when clicking outside
-    const handleClickOutside = (e: MouseEvent) => {
-      if (cardsRef.current && !cardsRef.current.contains(e.target as Node)) {
-        setSelectedFeatureKey(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (selectedFeatureKey !== null && detailRef.current) {
-      detailRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [selectedFeatureKey]);
+  const isDark = theme === "dark";
 
   const handleLogin = async () => {
     const auth = getAuth(app);
@@ -77,7 +66,28 @@ export default function Home() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
-  const isDark = theme === "dark";
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectedFeatureKey &&
+        detailRef.current &&
+        cardsRef.current &&
+        !detailRef.current.contains(event.target as Node) &&
+        !cardsRef.current.contains(event.target as Node)
+      ) {
+        setSelectedFeatureKey(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [selectedFeatureKey]);
+
+  useEffect(() => {
+    if (selectedFeatureKey !== null && detailRef.current) {
+      detailRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedFeatureKey]);
 
   return (
     <>
@@ -88,14 +98,46 @@ export default function Home() {
       </Head>
 
       <style>{`
-        body {
-          margin: 0;
-        }
-
         @keyframes darkGradient {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
+        }
+        @keyframes rainbowGradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .rainbow-text {
+          font-size: 2.5rem;
+          font-weight: 800;
+          line-height: 1.2;
+          max-width: 720px;
+          user-select: text;
+          background: linear-gradient(
+            270deg,
+            #3b82f6,
+            #8b5cf6,
+            #ec4899,
+            #f59e0b,
+            #10b981,
+            #06b6d4,
+            #3b82f6
+          );
+          background-size: 400% 400%;
+          animation: rainbowGradient 8s ease infinite;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          transition: background 0.3s ease;
+        }
+        .rainbow-text:hover {
+          animation: none;
+          background: #3b82f6;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        body {
+          margin: 0;
         }
       `}</style>
 
@@ -109,51 +151,44 @@ export default function Home() {
           animation: isDark ? "darkGradient 20s ease infinite" : undefined,
         }}
       >
-        <div
+        <main
           style={{
-            maxWidth: "1200px",
+            maxWidth: "1120px",
             margin: "0 auto",
             display: "flex",
             flexDirection: "column",
-            gap: "2rem",
-            color: isDark ? "white" : "black",
-            fontFamily: "sans-serif",
-            paddingBottom: "3rem",
+            gap: "1.5rem",
+            padding: "2rem 2rem 3rem 2rem",
+            color: isDark ? "#e0e7ff" : "#1e1e1e",
           }}
         >
-          <Header onLoginClick={handleLogin} isLoggedIn={isLoggedIn} />
-          <FeatureCards
-            selected={selectedFeatureKey}
-            toggleSelection={toggleSelection}
-            cardsRef={cardsRef}
-            detailRef={detailRef}
-            isDark={isDark} // Pass theme to FeatureCards
+          <Header
+            onLoginClick={handleLogin}
+            isLoggedIn={isLoggedIn}
+            isDark={isDark}
+            onToggleTheme={toggleTheme}
           />
-          <FeatureDetail selectedKey={selectedFeatureKey} ref={detailRef} />
+          <IntroText />
+          <FeatureCards
+            selectedFeatureKey={selectedFeatureKey}
+            setSelectedFeatureKey={setSelectedFeatureKey}
+            handleCardKeyDown={(e, key) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleSelection(key);
+              }
+            }}
+            cardsRef={cardsRef}
+            isDark={isDark}
+          />
+          <FeatureDetail
+            selectedFeatureKey={selectedFeatureKey}
+            detailRef={detailRef}
+            isDark={isDark}
+          />
           <SocialLinks />
-
-          {/* Theme Toggle Button */}
-          <div style={{ textAlign: "center", marginTop: "2rem" }}>
-            <button
-              onClick={toggleTheme}
-              style={{
-                background: isDark ? "#ffffff20" : "#00000020",
-                border: "none",
-                padding: "0.5rem 1rem",
-                borderRadius: "30px",
-                cursor: "pointer",
-                color: isDark ? "white" : "black",
-                fontSize: "1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "center",
-              }}
-            >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          </div>
-        </div>
+          {/* Removed bottom theme toggle button to fix spacing */}
+        </main>
       </div>
     </>
   );
