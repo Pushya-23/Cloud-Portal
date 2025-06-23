@@ -27,14 +27,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const tokenResult = await getIdTokenResult(firebaseUser, true);
-        const roleClaim = tokenResult.claims.role as Role;
-        setUser(firebaseUser);
-        setRole(roleClaim ?? null);
+        try {
+          // 🔁 Refresh user info to ensure displayName/photoURL are updated
+          await firebaseUser.reload();
+          const refreshedUser = auth.currentUser;
+
+          if (refreshedUser) {
+            const tokenResult = await getIdTokenResult(refreshedUser, true);
+            const roleClaim = tokenResult.claims.role as Role;
+
+            setUser(refreshedUser);
+            setRole(roleClaim ?? null);
+          } else {
+            setUser(null);
+            setRole(null);
+          }
+        } catch (error) {
+          console.error("Error refreshing user:", error);
+          setUser(firebaseUser); // fallback
+        }
       } else {
         setUser(null);
         setRole(null);
       }
+
       setLoading(false);
     });
 

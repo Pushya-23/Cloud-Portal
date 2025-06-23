@@ -93,11 +93,83 @@ const CloudConnectForm: React.FC<Props> = ({ user }) => {
     }
   };
 
+  const logoMap: { [key in "aws" | "gcp" | "azure"]: string } = {
+    aws: "/aws-icon.png",
+    gcp: "/gcp-icon.png",
+    azure: "/azure-icon.png",
+  };
+
+  const showClearButton =
+    provider !== "gcp" &&
+    Object.values(formData).some((val) => val && val.trim && val.trim() !== "");
+
+  const clearInputs = () => {
+    setFormData({});
+    setSubmitError("");
+    setSubmitMessage("");
+  };
+
   return (
-    <section className="mt-8 mb-[0.5cm]">
-      <Card>
-        <Title level={4}>Cloud Connect - {provider.toUpperCase()}</Title>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <section
+      className="mt-8 mb-[0.5cm]"
+      style={{ fontFamily: "Times New Roman, Times, serif" }}
+    >
+      <Card
+        style={{
+          height: "260px",
+          backgroundColor: "#1e293b",
+          color: "#ffffff",
+          overflow: "hidden",
+          borderRadius: "16px",
+          border: "none",
+          fontFamily: "Times New Roman, Times, serif",
+          position: "relative",
+        }}
+      >
+        {/* Clear Button */}
+        {showClearButton && (
+          <Button
+            size="small"
+            style={{
+              position: "absolute",
+              top: "16px",
+              right: "16px",
+              zIndex: 10,
+              backgroundColor: "#334155",
+              color: "#fff",
+              fontSize: "12px",
+              fontFamily: "Times New Roman, Times, serif",
+              border: "1px solid #475569",
+            }}
+            onClick={clearInputs}
+          >
+            Clear
+          </Button>
+        )}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: "1rem",
+            fontFamily: "Times New Roman, Times, serif",
+          }}
+        >
+          <img
+            src={logoMap[provider]}
+            alt={`${provider} logo`}
+            style={{ height: "40px", marginRight: "10px" }}
+          />
+          <Title level={4} style={{ color: "#ffffff", margin: 0, fontFamily: "Times New Roman, Times, serif" }}>
+            Cloud Connect - {provider.toUpperCase()}
+          </Title>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col items-center"
+          style={{ fontFamily: "Times New Roman, Times, serif" }}
+        >
           <select
             onChange={(e) => {
               setProvider(e.target.value as "aws" | "gcp" | "azure");
@@ -106,7 +178,8 @@ const CloudConnectForm: React.FC<Props> = ({ user }) => {
               setSubmitMessage("");
             }}
             value={provider}
-            className="border px-3 py-2 rounded w-full"
+            className="border px-3 py-3 w-96 mb-[0.2cm]"
+            style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
           >
             <option value="aws">AWS</option>
             <option value="gcp">GCP</option>
@@ -117,15 +190,23 @@ const CloudConnectForm: React.FC<Props> = ({ user }) => {
             <>
               <input
                 placeholder="Access Key"
-                onChange={(e) => setFormData({ ...formData, accessKey: e.target.value })}
-                className="border px-3 py-2 w-full"
+                onChange={(e) =>
+                  setFormData({ ...formData, accessKey: e.target.value })
+                }
+                value={formData.accessKey || ""}
+                className="border px-3 py-3 w-96 mb-[0.2cm]"
                 required
+                style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
               />
               <input
                 placeholder="Secret Key"
-                onChange={(e) => setFormData({ ...formData, secretKey: e.target.value })}
-                className="border px-3 py-2 w-full mb-[0.25cm]"
+                onChange={(e) =>
+                  setFormData({ ...formData, secretKey: e.target.value })
+                }
+                value={formData.secretKey || ""}
+                className="border px-3 py-3 w-96 mb-[0.6cm]"
                 required
+                style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
               />
             </>
           )}
@@ -135,8 +216,9 @@ const CloudConnectForm: React.FC<Props> = ({ user }) => {
               type="file"
               accept="application/json"
               onChange={handleFileChange}
-              className="w-full mb-[0.25cm]"
+              className="w-96 mb-[0.6cm]"
               required
+              style={{ fontFamily: "Times New Roman, Times, serif" }}
             />
           )}
 
@@ -144,33 +226,70 @@ const CloudConnectForm: React.FC<Props> = ({ user }) => {
             <>
               <input
                 placeholder="Tenant ID"
-                onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
-                className="border px-3 py-2 w-full"
+                onChange={(e) =>
+                  setFormData({ ...formData, tenantId: e.target.value })
+                }
+                value={formData.tenantId || ""}
+                className="border px-3 py-3 w-96 mb-[0.2cm]"
                 required
+                style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
               />
               <input
                 placeholder="Client ID"
-                onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                className="border px-3 py-2 w-full"
+                onChange={(e) =>
+                  setFormData({ ...formData, clientId: e.target.value })
+                }
+                value={formData.clientId || ""}
+                className="border px-3 py-3 w-96 mb-[0.2cm]"
                 required
+                style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
               />
               <input
                 placeholder="Client Secret"
-                onChange={(e) => setFormData({ ...formData, clientSecret: e.target.value })}
-                className="border px-3 py-2 w-full mb-[0.25cm]"
+                onChange={(e) =>
+                  setFormData({ ...formData, clientSecret: e.target.value })
+                }
+                value={formData.clientSecret || ""}
+                className="border px-3 py-3 w-96 mb-[0.4cm]"
                 required
+                style={{ color: "#333", fontFamily: "Times New Roman, Times, serif" }}
               />
             </>
           )}
 
-          <div className="flex justify-end mt-[0.5cm]">
-            <Button htmlType="submit" type="primary" loading={isSubmitting}>
+          <div className="w-96 flex justify-end">
+            <Button
+              htmlType="submit"
+              type="primary"
+              loading={isSubmitting}
+              style={{ fontFamily: "Times New Roman, Times, serif" }}
+            >
               Connect to {provider.toUpperCase()}
             </Button>
           </div>
 
-          {submitMessage && <p style={{ color: "green" }}>{submitMessage}</p>}
-          {submitError && <p style={{ color: "red" }}>{submitError}</p>}
+          {submitMessage && (
+            <p
+              style={{
+                color: "green",
+                marginTop: "0.2cm",
+                fontFamily: "Times New Roman, Times, serif",
+              }}
+            >
+              {submitMessage}
+            </p>
+          )}
+          {submitError && (
+            <p
+              style={{
+                color: "red",
+                marginTop: "0.2cm",
+                fontFamily: "Times New Roman, Times, serif",
+              }}
+            >
+              {submitError}
+            </p>
+          )}
         </form>
       </Card>
     </section>
