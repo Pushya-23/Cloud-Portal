@@ -23,6 +23,7 @@ export default function Dashboard() {
   const GAP_LEFT = 0.5 * 37.8;
 
   useEffect(() => {
+    // Prevent scroll and padding shift
     document.body.style.margin = "0";
     document.body.style.padding = "0";
     document.documentElement.style.overflow = "hidden";
@@ -30,12 +31,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/");
+      router.replace("/");
     }
   }, [authLoading, user, router]);
 
   if (authLoading || !user) {
-    return <p style={{ color: "white" }}>Loading...</p>;
+    return <p style={{ color: "white", textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
   }
 
   const sidebarWidth = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
@@ -83,7 +84,7 @@ export default function Dashboard() {
             onLogout={async () => {
               try {
                 await logout();
-                router.push("/");
+                router.replace("/");
               } catch {
                 message.error("Logout failed.");
               }

@@ -1,6 +1,15 @@
 // frontend/context/AuthContext.tsx
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut, User, getIdTokenResult } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signOut,
+  User,
+  getIdTokenResult,
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence
+} from 'firebase/auth';
 import { auth } from '../firebase';
 
 type Role = 'admin' | 'user' | null;
@@ -9,6 +18,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   role: Role;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -16,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   role: null,
+  login: async () => {},
   logout: async () => {},
 });
 
@@ -56,6 +67,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  const login = async (email: string, password: string) => {
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error("Login failed:", error.message);
+      throw error; // Pass the error up to the UI for messages
+    }
+  };
+
   const logout = async () => {
     await signOut(auth);
     setUser(null);
@@ -63,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, role, logout }}>
+    <AuthContext.Provider value={{ user, loading, role, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
