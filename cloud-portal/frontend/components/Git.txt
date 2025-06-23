@@ -1,0 +1,14 @@
+✅ Run this first:
+
+1.git add .
+
+That dot (`.`) is very important — it tells Git to add all changes in the current directory and its subdirectories.
+
+2.Then run:
+
+git commit -m "Updated dashboard components and layout"
+
+3.And finally push:
+
+git push origin main
+
