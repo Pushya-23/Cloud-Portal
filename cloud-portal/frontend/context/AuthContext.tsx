@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // 🔁 Refresh user info to ensure displayName/photoURL are updated
           await firebaseUser.reload();
           const refreshedUser = auth.currentUser;
 
@@ -70,5 +69,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// ✅ This is the hook you should use in other components
 export const useAuth = () => useContext(AuthContext);

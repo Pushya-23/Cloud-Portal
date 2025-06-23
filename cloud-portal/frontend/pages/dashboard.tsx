@@ -1,7 +1,6 @@
+// frontend/pages/dashboard.tsx
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "../firebase";
 import { message } from "antd";
 import { useAuth } from "../context/AuthContext";
 
@@ -15,40 +14,27 @@ import CostInsightsChart from "../components/Dashboard/CostInsightChart";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
-  const SIDEBAR_COLLAPSED = 56; // 3.5rem
-  const SIDEBAR_EXPANDED = 192; // 12rem
+  const SIDEBAR_COLLAPSED = 56;
+  const SIDEBAR_EXPANDED = 192;
   const HEADER_HEIGHT = 65;
-  const GAP_LEFT = 0.5 * 37.8; // 0.5cm ≈ 18.9px
+  const GAP_LEFT = 0.5 * 37.8;
 
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
     document.documentElement.style.overflow = "hidden";
+  }, []);
 
-    const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u) router.push("/");
-      else setFirebaseUser(u);
-      setLoading(false);
-    });
-    return () => unsub();
-  }, [router]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem("token");
+  useEffect(() => {
+    if (!authLoading && !user) {
       router.push("/");
-    } catch {
-      message.error("Logout failed.");
     }
-  };
+  }, [authLoading, user, router]);
 
-  if (authLoading || loading) {
+  if (authLoading || !user) {
     return <p style={{ color: "white" }}>Loading...</p>;
   }
 
@@ -64,14 +50,12 @@ export default function Dashboard() {
         overflow: "hidden",
       }}
     >
-      {/* Fixed Sidebar */}
       <Sidebar
-        firebaseUser={firebaseUser}
+        firebaseUser={user}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
       />
 
-      {/* Main Scrollable Content with Header inside */}
       <div
         style={{
           position: "absolute",
@@ -85,7 +69,6 @@ export default function Dashboard() {
           boxSizing: "border-box",
         }}
       >
-        {/* Header */}
         <div
           style={{
             paddingTop: "1rem",
@@ -95,13 +78,19 @@ export default function Dashboard() {
           }}
         >
           <DashboardHeader
-            firebaseUser={firebaseUser}
+            firebaseUser={user}
             collapsed={collapsed}
-            onLogout={handleLogout}
+            onLogout={async () => {
+              try {
+                await logout();
+                router.push("/");
+              } catch {
+                message.error("Logout failed.");
+              }
+            }}
           />
         </div>
 
-        {/* Main Content */}
         <div
           style={{
             paddingRight: "1rem",
@@ -109,37 +98,17 @@ export default function Dashboard() {
             paddingLeft: "1cm",
           }}
         >
-          {/* Summary Cards */}
           <SummaryCards />
 
-          {/* CloudConnectForm + ResourcePieChart */}
-          <div
-            style={{
-              display: "flex",
-              gap: "13px",
-              marginBottom: "13px",
-            }}
-          >
-            <div
-              style={{
-                flex: "0 0 58%",
-                height: "260px",
-                boxSizing: "border-box",
-              }}
-            >
+          <div style={{ display: "flex", gap: "13px", marginBottom: "13px" }}>
+            <div style={{ flex: "0 0 58%", height: "260px", boxSizing: "border-box" }}>
               <CloudConnectForm user={user} />
             </div>
-            <div
-              style={{
-                flex: "0 0 41%",
-                minWidth: 0,
-              }}
-            >
+            <div style={{ flex: "0 0 41%", minWidth: 0 }}>
               <ResourcePieChart />
             </div>
           </div>
 
-          {/* Bottom Charts */}
           <section
             style={{
               display: "grid",
