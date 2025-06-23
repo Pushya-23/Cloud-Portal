@@ -8,7 +8,7 @@ import {
   getIdTokenResult,
   signInWithEmailAndPassword,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -69,11 +69,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log("🔐 Attempting login", { email }); // helpful for Vercel debug
       await setPersistence(auth, browserLocalPersistence);
       await signInWithEmailAndPassword(auth, email, password);
+      console.log("✅ Login successful");
     } catch (error: any) {
-      console.error("Login failed:", error.message);
-      throw error; // Pass the error up to the UI for messages
+      console.error("❌ Login failed:", error.message);
+      throw error; // Pass error to UI
     }
   };
 

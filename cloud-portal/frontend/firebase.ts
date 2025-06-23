@@ -15,7 +15,8 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!,
 };
 
-console.log("FIREBASE CONFIG", firebaseConfig);
+console.log("🔥 FIREBASE CONFIG (PROD):", firebaseConfig);
+
 
 // Initialize Firebase app once
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
