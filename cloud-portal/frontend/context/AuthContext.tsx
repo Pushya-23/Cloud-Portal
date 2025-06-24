@@ -39,29 +39,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          await firebaseUser.reload();
-          const refreshedUser = auth.currentUser;
+          const tokenResult = await getIdTokenResult(firebaseUser, true);
+          const roleClaim = tokenResult.claims.role as Role;
 
-          if (refreshedUser) {
-            const tokenResult = await getIdTokenResult(refreshedUser, true);
-            const roleClaim = tokenResult.claims.role as Role;
-
-            setUser(refreshedUser);
-            setRole(roleClaim ?? null);
-          } else {
-            setUser(null);
-            setRole(null);
-          }
+          setUser(firebaseUser);
+          setRole(roleClaim ?? null);
         } catch (error) {
-          console.error("Error refreshing user:", error);
-          setUser(firebaseUser); // fallback
+          console.error("Error loading user or role:", error);
+          setUser(firebaseUser); // fallback to basic user
+          setRole(null);
         }
       } else {
         setUser(null);
         setRole(null);
       }
 
-      setLoading(false);
+      setLoading(false); // ✅ ensures fast UI transition
     });
 
     return () => unsubscribe();
@@ -69,13 +62,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("🔐 Attempting login", { email }); // helpful for Vercel debug
+      console.log("🔐 Attempting login", { email });
       await setPersistence(auth, browserLocalPersistence);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ Login successful");
     } catch (error: any) {
       console.error("❌ Login failed:", error.message);
-      throw error; // Pass error to UI
+      throw error;
     }
   };
 
